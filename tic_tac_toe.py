@@ -1,17 +1,8 @@
 import os
 
-print('Welcome to Tic Tac Toe!')
-print('\n')
+#Functions --------------------------------------------------------------------------------------------------
 
-player1 = input('Enter the name of the first player: ')
-player2 = input('Enter the name of the second player: ')
-print('\n')
-
-print(f'The sign for {player1} is "X" and the sign for {player2} is "O"')
-print('\n')
-input('Enter to continue')
-os.system('clear')
-
+#Print the board with the update for the position choosen
 def print_board(board):
     print(f'''
      |     |     
@@ -25,79 +16,116 @@ def print_board(board):
      |     |     
   {board[0]}  |  {board[1]}  |  {board[2]}  
      |     |     
-    ''')
+    \n''')
 
-print('You need to use this board as reference to insert an "X" or "O" in the position you want\n')
-board = ['1','2','3','4','5','6','7','8','9']
-print_board(board)
-input('\nEnter to continue')
-os.system('clear')
-
-# "board" list keeps "X"s and "O"s
-board = [' ',' ',' ',' ',' ',' ',' ',' ',' ']
-
-#check whether the position is available or is already choosen
+#Check whether the position is available or is already choosen
 def check_available(position):
     return ' ' == board[position-1]
 
-#Check if sombody has won
-def check_for_win():
-    x_win= ['X','X','X']
-    o_win= ['O','O','O']
-
-    if board[:3] == x_win  or board[3:6] == x_win or board[6:] == x_win: #Horizontal Check for X and O
-        return True
-    elif board[:3] == o_win  or board[3:6] == o_win or board[6:] == o_win:
-        return True
-    elif [x for x in board[::3]] == x_win  or [x for x in board[1::3]] == x_win or [x for x in board[2::3]] == x_win: #Vertical Check for X and O
-        return True
-    elif [x for x in board[::3]] == o_win  or [x for x in board[1::3]] == o_win or [x for x in board[2::3]] == o_win:
-        return True
-    elif [x for x in board[::4]] == x_win or [x for x in board[::4]] == o_win: #Crossed check for X and O
-        return True
-    elif [x for x in board[2:8:2]] == x_win or [x for x in board[2:8:2]] == o_win:
-        return True
-    else:
-        return False
-
-players_turn = player1
-
-while(' ' in board):
-    print(f'{players_turn}\'s turn \n ')
-    print_board(board)
-
+#Check if the input is correct
+def check_input():
     position = int(input('Choose a position: '))
 
     while(True):
-        if check_available(position):
-            break
+        if position in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
+            if check_available(position):
+                return position
+            else:
+                position = int(input('Invalid position. That position is already choosen: '))
         else:
-            position = int(input('That position is already choosen. Choose another position: '))
+            position = int(input('Invalid position. Choose a cell bewteen 1 and 9: '))        
 
-    #Set the X or O in the cell
+#Insert the marker in the position choosen for the corresponding player        
+def insert_marker(position, players_turn):
     if players_turn == player1:
         board[position-1] = 'X'
     else:
-        board[position-1] = 'O'
+        board[position-1] = 'O'    
 
-    if check_for_win():
-        break
-    #Changing player before the next iteration
+#Check if sombody has won
+def check_for_win():
+    #Check horizontal
+    if board[0] == board[1] == board[2] and board[0] != ' ':
+        return True
+    elif board[3] == board[4] == board[5] and board[3] != ' ':
+        return True
+    elif board[6] == board[7] == board[8] and board[6] != ' ':
+        return True
+     #Check vertical   
+    elif board[0] == board[3] == board[6] and board[0] != ' ':
+        return True
+    elif board[1] == board[4] == board[7] and board[1] != ' ':
+        return True
+    elif board[2] == board[5] == board[8] and board[2] != ' ':
+        return True
+    #Check crossed    
+    elif board[0] == board[4] == board[8] and board[0] != ' ':
+        return True
+    elif board[2] == board[4] == board[6] and board[2] != ' ':
+        return True
+    else: 
+        False
+
+#Change the player's turn for the next iteration
+def change_turn(players_turn, player1, player2):
     if players_turn == player1:
-        players_turn = player2
+        return player2
     else:
-        players_turn = player1
-            
+        return player1
+
+#End of functions-------------------------------------------------------------------------------------------
+
+print('Welcome to Tic Tac Toe!')
+print('\n')
+
+while(True):
+    player1 = input('Enter the name of the first player: ')
+    player2 = input('Enter the name of the second player: ')
+    print('\n')
+
+    print(f'The sign for {player1} is "X" and the sign for {player2} is "O"')
+    print('\n')
+    input('Enter to continue')
     os.system('clear')
 
-os.system('clear')
-print_board(board)
+    print('You need to use this board as reference to insert an "X" or "O" in the position you want\n')
+    board = ['1','2','3','4','5','6','7','8','9']
+    print_board(board)
+    input('\nEnter to continue')
+    os.system('clear')
 
-if ' ' in board:
-    print(f'{players_turn} has win!')
-else:
-    if check_for_win():
-        print(f'{players_turn} has win!')
-    else:
-        print('Nobody has won :c')    
+    # "board" list keeps "X"s and "O"s
+    board = [' ',' ',' ',' ',' ',' ',' ',' ',' ']       
+    players_turn = player1
+
+    #The game starts
+    while(' ' in board):
+        print(f'{players_turn}\'s turn \n ')
+        print_board(board)
+
+        position = check_input()
+
+        insert_marker(position, players_turn)
+
+        if check_for_win():
+            os.system('clear')
+            print_board(board)
+            print(f'{players_turn} has won!\n')
+            break
+
+        players_turn = change_turn(players_turn, player1, player2)
+                
+        os.system('clear')
+
+    if not ' ' in board:
+        os.system('clear')
+        print_board(board)
+        print('Tie!\n')    
     
+    answer = input('Press enter to exit or type "yes" to replay: ')
+    if not answer == 'yes':
+        break
+    
+    os.system('clear')
+    
+os.system('clear')
